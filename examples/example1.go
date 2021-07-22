@@ -5,87 +5,80 @@ import (
 	"os"
 	"syscall"
 
-	i2c "github.com/d2r2/go-i2c"
-	logger "github.com/d2r2/go-logger"
 	shell "github.com/d2r2/go-shell"
-	vl53l0x "github.com/d2r2/go-vl53l0x"
-)
-
-var lg = logger.NewPackageLogger("main",
-	logger.DebugLevel,
-	// logger.InfoLevel,
+	"github.com/d2r2/go-vl53l0x"
+	"github.com/googolgl/go-i2c"
 )
 
 func main() {
-	defer logger.FinalizeLogger()
 	// Create new connection to i2c-bus on 1 line with address 0x40.
 	// Use i2cdetect utility to find device address over the i2c-bus
-	i2c, err := i2c.NewI2C(0x29, 0)
+	i2c, err := i2c.New(0x29, 0)
 	if err != nil {
-		lg.Fatal(err)
+		i2c.Log.Fatal(err)
 	}
 	defer i2c.Close()
 
-	lg.Notify("**********************************************************************************************")
-	lg.Notify("*** !!! READ THIS !!!")
-	lg.Notify("*** You can change verbosity of output, by modifying logging level of modules \"i2c\", \"vl53l0x\".")
-	lg.Notify("*** Uncomment/comment corresponding lines with call to ChangePackageLogLevel(...)")
-	lg.Notify("*** !!! READ THIS !!!")
-	lg.Notify("**********************************************************************************************")
+	i2c.Log.Infoln("**********************************************************************************************")
+	i2c.Log.Infoln("*** !!! READ THIS !!!")
+	i2c.Log.Infoln("*** You can change verbosity of output, by modifying logging level of modules \"i2c\", \"vl53l0x\".")
+	i2c.Log.Infoln("*** Uncomment/comment corresponding lines with call to ChangePackageLogLevel(...)")
+	i2c.Log.Infoln("*** !!! READ THIS !!!")
+	i2c.Log.Infoln("**********************************************************************************************")
 	// Uncomment/comment next line to suppress/increase verbosity of output
-	logger.ChangePackageLogLevel("i2c", logger.InfoLevel)
-	logger.ChangePackageLogLevel("vl53l0x", logger.InfoLevel)
+	//logger.ChangePackageLogLevel("i2c", logger.InfoLevel)
+	//logger.ChangePackageLogLevel("vl53l0x", logger.InfoLevel)
 
-	sensor := vl53l0x.NewVl53l0x()
-	lg.Notify("**********************************************************************************************")
-	lg.Notify("*** Reset/initialize sensor")
-	lg.Notify("**********************************************************************************************")
+	sensor := vl53l0x.New(i2c)
+	i2c.Log.Infoln("**********************************************************************************************")
+	i2c.Log.Infoln("*** Reset/initialize sensor")
+	i2c.Log.Infoln("**********************************************************************************************")
 	err = sensor.Reset(i2c)
 	if err != nil {
-		lg.Fatalf("Error reseting sensor: %s", err)
+		i2c.Log.Fatalf("Error reseting sensor: %s", err)
 	}
 	// It's highly recommended to reset sensor before repeated initialization.
 	// By default, sensor initialized with "RegularRange" and "RegularAccuracy" parameters.
 	err = sensor.Init(i2c)
 	if err != nil {
-		lg.Fatalf("Failed to initialize sensor: %s", err)
+		i2c.Log.Fatalf("Failed to initialize sensor: %s", err)
 	}
 	rev, err := sensor.GetProductMinorRevision(i2c)
 	if err != nil {
-		lg.Fatalf("Error getting sensor minor revision: %s", err)
+		i2c.Log.Fatalf("Error getting sensor minor revision: %s", err)
 	}
-	lg.Infof("Sensor minor revision = %d", rev)
+	i2c.Log.Infof("Sensor minor revision = %d", rev)
 
-	lg.Notify("**********************************************************************************************")
-	lg.Notify("*** Сonfigure sensor")
-	lg.Notify("**********************************************************************************************")
+	i2c.Log.Infoln("**********************************************************************************************")
+	i2c.Log.Infoln("*** Сonfigure sensor")
+	i2c.Log.Infoln("**********************************************************************************************")
 	rngConfig := vl53l0x.RegularRange
 	speedConfig := vl53l0x.GoodAccuracy
-	lg.Infof("Configure sensor with  %q and %q",
+	i2c.Log.Infof("Configure sensor with  %q and %q",
 		rngConfig, speedConfig)
 	err = sensor.Config(i2c, rngConfig, speedConfig)
 	if err != nil {
-		lg.Fatalf("Failed to initialize sensor: %s", err)
+		i2c.Log.Fatalf("Failed to initialize sensor: %s", err)
 	}
 
-	lg.Notify("**********************************************************************************************")
-	lg.Notify("*** Single shot range measurement mode")
-	lg.Notify("**********************************************************************************************")
+	i2c.Log.Infoln("**********************************************************************************************")
+	i2c.Log.Infoln("*** Single shot range measurement mode")
+	i2c.Log.Infoln("**********************************************************************************************")
 	rng, err := sensor.ReadRangeSingleMillimeters(i2c)
 	if err != nil {
-		lg.Fatalf("Failed to measure range: %s", err)
+		i2c.Log.Fatalf("Failed to measure range: %s", err)
 	}
-	lg.Infof("Measured range = %v mm", rng)
+	i2c.Log.Infof("Measured range = %v mm", rng)
 
-	lg.Notify("**********************************************************************************************")
-	lg.Notify("*** Continuous shot range measurement mode")
-	lg.Notify("**********************************************************************************************")
+	i2c.Log.Infoln("**********************************************************************************************")
+	i2c.Log.Infoln("*** Continuous shot range measurement mode")
+	i2c.Log.Infoln("**********************************************************************************************")
 	var freq uint32 = 100
 	times := 20
-	lg.Infof("Made measurement each %d milliseconds, %d times", freq, times)
+	i2c.Log.Infof("Made measurement each %d milliseconds, %d times", freq, times)
 	err = sensor.StartContinuous(i2c, freq)
 	if err != nil {
-		lg.Fatalf("Can't start continuous measures: %s", err)
+		i2c.Log.Fatalf("Can't start continuous measures: %s", err)
 	}
 	// create context with cancellation possibility
 	ctx, cancel := context.WithCancel(context.Background())
@@ -103,44 +96,44 @@ func main() {
 	for i := 0; i < times; i++ {
 		rng, err = sensor.ReadRangeContinuousMillimeters(i2c)
 		if err != nil {
-			lg.Fatalf("Failed to measure range: %s", err)
+			i2c.Log.Fatalf("Failed to measure range: %s", err)
 		}
-		lg.Infof("Measured range = %v mm", rng)
+		i2c.Log.Infof("Measured range = %v mm", rng)
 		select {
 		// Check for termination request.
 		case <-ctx.Done():
 			err = sensor.StopContinuous(i2c)
 			if err != nil {
-				lg.Fatal(err)
+				i2c.Log.Fatal(err)
 			}
-			lg.Fatal(ctx.Err())
+			i2c.Log.Fatal(ctx.Err())
 		default:
 		}
 	}
 	err = sensor.StopContinuous(i2c)
 	if err != nil {
-		lg.Fatalf("Error stopping continuous measures: %s", err)
+		i2c.Log.Fatalf("Error stopping continuous measures: %s", err)
 	}
 
-	lg.Notify("**********************************************************************************************")
-	lg.Notify("*** Reconfigure sensor")
-	lg.Notify("**********************************************************************************************")
+	i2c.Log.Infoln("**********************************************************************************************")
+	i2c.Log.Infoln("*** Reconfigure sensor")
+	i2c.Log.Infoln("**********************************************************************************************")
 	rngConfig = vl53l0x.RegularRange
 	speedConfig = vl53l0x.RegularAccuracy
-	lg.Infof("Reconfigure sensor with %q and %q",
+	i2c.Log.Infof("Reconfigure sensor with %q and %q",
 		rngConfig, speedConfig)
 	err = sensor.Config(i2c, rngConfig, speedConfig)
 	if err != nil {
-		lg.Fatalf("Failed to initialize sensor: %s", err)
+		i2c.Log.Fatalf("Failed to initialize sensor: %s", err)
 	}
 
-	lg.Notify("**********************************************************************************************")
-	lg.Notify("*** Single shot range measurement mode")
-	lg.Notify("**********************************************************************************************")
+	i2c.Log.Infoln("**********************************************************************************************")
+	i2c.Log.Infoln("*** Single shot range measurement mode")
+	i2c.Log.Infoln("**********************************************************************************************")
 	rng, err = sensor.ReadRangeSingleMillimeters(i2c)
 	if err != nil {
-		lg.Fatalf("Failed to measure range: %s", err)
+		i2c.Log.Fatalf("Failed to measure range: %s", err)
 	}
-	lg.Infof("Measured range = %v mm", rng)
+	i2c.Log.Infof("Measured range = %v mm", rng)
 
 }

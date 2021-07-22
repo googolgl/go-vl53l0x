@@ -1,5 +1,4 @@
 //--------------------------------------------------------------------------------------------------
-//
 // This code is an adaptation and translation of well-formed C++ library to GOLANG for the distance
 // measure sensor's family VL53L0X taken from https://github.com/pololu/vl53l0x-arduino:
 //      https://github.com/pololu/vl53l0x-arduino/blob/master/VL53L0X.cpp
@@ -9,28 +8,6 @@
 //      https://github.com/adafruit/Adafruit_VL53L0X/blob/master/src/core/src/vl53l0x_api.cpp
 //      https://github.com/adafruit/Adafruit_VL53L0X/blob/master/src/vl53l0x_def.h
 //      https://github.com/adafruit/Adafruit_VL53L0X/blob/master/src/vl53l0x_device.h
-//
-//
-// Copyright (c) 2018 Denis Dyakov
-// Copyright (c) 2017 Pololu Corporation
-// Copyright (c) 2016 Adafruit Industries
-// Copyright (c) 2016 STMicroelectronics International N.V.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
-// associated documentation files (the "Software"), to deal in the Software without restriction,
-// including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
-// subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all copies or substantial
-// portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
-// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
 //--------------------------------------------------------------------------------------------------
 
 package vl53l0x
@@ -39,93 +16,8 @@ import (
 	"errors"
 	"time"
 
-	i2c "github.com/d2r2/go-i2c"
 	"github.com/davecgh/go-spew/spew"
-)
-
-// Registers from sensor hardware.
-const (
-	SYSRANGE_START = 0x00
-
-	SYSTEM_THRESH_HIGH = 0x0C
-	SYSTEM_THRESH_LOW  = 0x0E
-
-	SYSTEM_SEQUENCE_CONFIG         = 0x01
-	SYSTEM_RANGE_CONFIG            = 0x09
-	SYSTEM_INTERMEASUREMENT_PERIOD = 0x04
-
-	SYSTEM_INTERRUPT_CONFIG_GPIO = 0x0A
-
-	GPIO_HV_MUX_ACTIVE_HIGH = 0x84
-
-	SYSTEM_INTERRUPT_CLEAR = 0x0B
-
-	RESULT_INTERRUPT_STATUS = 0x13
-	RESULT_RANGE_STATUS     = 0x14
-
-	RESULT_CORE_AMBIENT_WINDOW_EVENTS_RTN = 0xBC
-	RESULT_CORE_RANGING_TOTAL_EVENTS_RTN  = 0xC0
-	RESULT_CORE_AMBIENT_WINDOW_EVENTS_REF = 0xD0
-	RESULT_CORE_RANGING_TOTAL_EVENTS_REF  = 0xD4
-	RESULT_PEAK_SIGNAL_RATE_REF           = 0xB6
-
-	ALGO_PART_TO_PART_RANGE_OFFSET_MM = 0x28
-
-	I2C_SLAVE_DEVICE_ADDRESS = 0x8A
-
-	MSRC_CONFIG_CONTROL = 0x60
-
-	PRE_RANGE_CONFIG_MIN_SNR           = 0x27
-	PRE_RANGE_CONFIG_VALID_PHASE_LOW   = 0x56
-	PRE_RANGE_CONFIG_VALID_PHASE_HIGH  = 0x57
-	PRE_RANGE_MIN_COUNT_RATE_RTN_LIMIT = 0x64
-
-	FINAL_RANGE_CONFIG_MIN_SNR                  = 0x67
-	FINAL_RANGE_CONFIG_VALID_PHASE_LOW          = 0x47
-	FINAL_RANGE_CONFIG_VALID_PHASE_HIGH         = 0x48
-	FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT = 0x44
-
-	PRE_RANGE_CONFIG_SIGMA_THRESH_HI = 0x61
-	PRE_RANGE_CONFIG_SIGMA_THRESH_LO = 0x62
-
-	PRE_RANGE_CONFIG_VCSEL_PERIOD      = 0x50
-	PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI = 0x51
-	PRE_RANGE_CONFIG_TIMEOUT_MACROP_LO = 0x52
-
-	SYSTEM_HISTOGRAM_BIN                  = 0x81
-	HISTOGRAM_CONFIG_INITIAL_PHASE_SELECT = 0x33
-	HISTOGRAM_CONFIG_READOUT_CTRL         = 0x55
-
-	FINAL_RANGE_CONFIG_VCSEL_PERIOD       = 0x70
-	FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI  = 0x71
-	FINAL_RANGE_CONFIG_TIMEOUT_MACROP_LO  = 0x72
-	CROSSTALK_COMPENSATION_PEAK_RATE_MCPS = 0x20
-
-	MSRC_CONFIG_TIMEOUT_MACROP = 0x46
-
-	SOFT_RESET_GO2_SOFT_RESET_N = 0xBF
-	IDENTIFICATION_MODEL_ID     = 0xC0
-	IDENTIFICATION_REVISION_ID  = 0xC2
-
-	OSC_CALIBRATE_VAL = 0xF8
-
-	GLOBAL_CONFIG_VCSEL_WIDTH        = 0x32
-	GLOBAL_CONFIG_SPAD_ENABLES_REF_0 = 0xB0
-	GLOBAL_CONFIG_SPAD_ENABLES_REF_1 = 0xB1
-	GLOBAL_CONFIG_SPAD_ENABLES_REF_2 = 0xB2
-	GLOBAL_CONFIG_SPAD_ENABLES_REF_3 = 0xB3
-	GLOBAL_CONFIG_SPAD_ENABLES_REF_4 = 0xB4
-	GLOBAL_CONFIG_SPAD_ENABLES_REF_5 = 0xB5
-
-	GLOBAL_CONFIG_REF_EN_START_SELECT   = 0xB6
-	DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD = 0x4E
-	DYNAMIC_SPAD_REF_EN_START_OFFSET    = 0x4F
-	POWER_MANAGEMENT_GO1_POWER_FORCE    = 0x80
-
-	VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV = 0x89
-
-	ALGO_PHASECAL_LIM            = 0x30
-	ALGO_PHASECAL_CONFIG_TIMEOUT = 0x30
+	"github.com/googolgl/go-i2c"
 )
 
 // VcselPeriodType is a type of VCSEL (vertical cavity surface emitting laser) pulse period.
@@ -208,23 +100,25 @@ type Vl53l0x struct {
 	measurementTimingBudgetUsec uint32
 	// default timeout value
 	ioTimeout time.Duration
+	i2c       *i2c.Options
 }
 
-// NewVl53l0x creates sensor instance.
-func NewVl53l0x() *Vl53l0x {
-	v := &Vl53l0x{}
-	return v
+// New creates sensor instance.
+func New(i2c *i2c.Options) *Vl53l0x {
+	return &Vl53l0x{
+		i2c: i2c,
+	}
 }
 
 // Config configure sensor expected distance range and time to make a measurement.
-func (v *Vl53l0x) Config(i2c *i2c.I2C, rng RangeSpec, speed SpeedAccuracySpec) error {
+func (v *Vl53l0x) Config(i2c *i2c.Options, rng RangeSpec, speed SpeedAccuracySpec) error {
 
-	lg.Debug("Start config")
+	i2c.Log.Debug("Start config")
 
 	switch rng {
 	case RegularRange:
 		// default is 0.25 MCPS
-		err := v.SetSignalRateLimit(i2c, 0.25)
+		err := v.SetSignalRateLimit(0.25)
 		if err != nil {
 			return err
 		}
@@ -237,9 +131,10 @@ func (v *Vl53l0x) Config(i2c *i2c.I2C, rng RangeSpec, speed SpeedAccuracySpec) e
 		if err != nil {
 			return err
 		}
+
 	case LongRange:
 		// lower the return signal rate limit (default is 0.25 MCPS)
-		err := v.SetSignalRateLimit(i2c, 0.1)
+		err := v.SetSignalRateLimit(0.1)
 		if err != nil {
 			return err
 		}
@@ -257,66 +152,71 @@ func (v *Vl53l0x) Config(i2c *i2c.I2C, rng RangeSpec, speed SpeedAccuracySpec) e
 	switch speed {
 	case HighSpeed:
 		// reduce timing budget to 20 ms (default is about 33 ms)
-		err := v.SetMeasurementTimingBudget(i2c, 20000)
+		err := v.SetMeasurementTimingBudget(20000)
 		if err != nil {
 			return err
 		}
+
 	case RegularAccuracy:
 		// default is about 33 ms
-		err := v.SetMeasurementTimingBudget(i2c, 33000)
+		err := v.SetMeasurementTimingBudget(33000)
 		if err != nil {
 			return err
 		}
+
 	case GoodAccuracy:
 		// increase timing budget to 66 ms
-		err := v.SetMeasurementTimingBudget(i2c, 66000)
+		err := v.SetMeasurementTimingBudget(66000)
 		if err != nil {
 			return err
 		}
+
 	case HighAccuracy:
 		// increase timing budget to 100 ms
-		err := v.SetMeasurementTimingBudget(i2c, 100000)
+		err := v.SetMeasurementTimingBudget(100000)
 		if err != nil {
 			return err
 		}
+
 	case HighestAccuracy:
 		// increase timing budget to 200 ms
-		err := v.SetMeasurementTimingBudget(i2c, 200000)
+		err := v.SetMeasurementTimingBudget(200000)
 		if err != nil {
 			return err
 		}
 	}
 
-	lg.Debug("End config")
+	i2c.Log.Debug("End config")
 
 	return nil
 }
 
 // Reset soft-reset the sensor.
 // Based on VL53L0X_ResetDevice().
-func (v *Vl53l0x) Reset(i2c *i2c.I2C) error {
-	// Set reset bit
-	lg.Debug("Set reset bit")
-	err := v.writeRegU8(i2c, SOFT_RESET_GO2_SOFT_RESET_N, 0x00)
-	if err != nil {
+func (v *Vl53l0x) Reset() error {
+	v.i2c.Log.Debug("Set reset bit")
+	if err := v.i2c.WriteRegU8(SOFT_RESET_GO2_SOFT_RESET_N, 0x00); err != nil {
 		return err
 	}
+
 	// Wait for some time
-	err = v.waitUntilOrTimeout(i2c, IDENTIFICATION_MODEL_ID,
+	err := v.waitUntilOrTimeout(IDENTIFICATION_MODEL_ID,
 		func(checkReg byte, err error) (bool, error) {
 			return checkReg == 0, err
 		})
 	if err != nil {
 		return err
 	}
+
 	// Release reset
-	lg.Debug("Release reset bit")
-	err = v.writeRegU8(i2c, SOFT_RESET_GO2_SOFT_RESET_N, 0x01)
+	v.i2c.Log.Debug("Release reset bit")
+	err = v.i2c.WriteRegU8(SOFT_RESET_GO2_SOFT_RESET_N, 0x01)
 	if err != nil {
 		return err
 	}
+
 	// Wait for some time
-	err = v.waitUntilOrTimeout(i2c, IDENTIFICATION_MODEL_ID,
+	err = v.waitUntilOrTimeout(IDENTIFICATION_MODEL_ID,
 		func(checkReg byte, err error) (bool, error) {
 			// Skip error like "read /dev/i2c-x: no such device or address"
 			// for a while, because sensor in reboot has temporary
@@ -332,8 +232,8 @@ func (v *Vl53l0x) Reset(i2c *i2c.I2C) error {
 
 // GetProductMinorRevision takes revision from sensor hardware.
 // Based on VL53L0X_GetProductRevision.
-func (v *Vl53l0x) GetProductMinorRevision(i2c *i2c.I2C) (byte, error) {
-	u8, err := v.readRegU8(i2c, IDENTIFICATION_REVISION_ID)
+func (v *Vl53l0x) GetProductMinorRevision(i2c *i2c.Options) (byte, error) {
+	u8, err := v.i2c.ReadRegU8(IDENTIFICATION_REVISION_ID)
 	if err != nil {
 		return 0, err
 	}
@@ -341,12 +241,12 @@ func (v *Vl53l0x) GetProductMinorRevision(i2c *i2c.I2C) (byte, error) {
 }
 
 // SetAddress change default address of sensor and reopen I2C-connection.
-func (v *Vl53l0x) SetAddress(i2cRef **i2c.I2C, newAddr byte) error {
-	err := v.writeRegU8(*i2cRef, I2C_SLAVE_DEVICE_ADDRESS, newAddr&0x7F)
+func (v *Vl53l0x) SetAddress(i2cRef **i2c.Options, newAddr byte) error {
+	err := v.i2c.WriteRegU8(I2C_SLAVE_DEVICE_ADDRESS, newAddr&0x7F)
 	if err != nil {
 		return err
 	}
-	*i2cRef, err = i2c.NewI2C(newAddr, (*i2cRef).GetBus())
+	*i2cRef, err = i2c.New(newAddr, (*i2cRef).GetBus())
 	return err
 }
 
@@ -356,19 +256,19 @@ func (v *Vl53l0x) SetAddress(i2cRef **i2c.I2C, newAddr byte) error {
 // (VL53L0X_PerformRefSpadManagement()), since the API user manual says that it
 // is performed by ST on the bare modules; it seems like that should work well
 // enough unless a cover glass is added.
-func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
+func (v *Vl53l0x) Init() error {
 
 	v.setTimeout(time.Millisecond * 1000)
 
 	// VL53L0X_DataInit() begin
 
 	// "Set I2C standard mode"
-	err := v.writeRegU8(i2c, 0x88, 0x00)
+	err := v.i2c.WriteRegU8(0x88, 0x00)
 	if err != nil {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0x80, Value: 0x01},
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x00, Value: 0x00},
@@ -376,11 +276,12 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 	if err != nil {
 		return err
 	}
-	v.stopVariable, err = v.readRegU8(i2c, 0x91)
+
+	v.stopVariable, err = v.i2c.ReadRegU8(0x91)
 	if err != nil {
 		return err
 	}
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0x00, Value: 0x01},
 		{Reg: 0xFF, Value: 0x00},
 		{Reg: 0x80, Value: 0x00},
@@ -390,22 +291,23 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 	}
 
 	// disable SIGNAL_RATE_MSRC (bit 1) and SIGNAL_RATE_PRE_RANGE (bit 4) limit checks
-	u8, err := v.readRegU8(i2c, MSRC_CONFIG_CONTROL)
+	u8, err := v.i2c.ReadRegU8(MSRC_CONFIG_CONTROL)
 	if err != nil {
 		return err
 	}
-	err = v.writeRegU8(i2c, MSRC_CONFIG_CONTROL, u8|0x12)
+
+	err = v.i2c.WriteRegU8(MSRC_CONFIG_CONTROL, u8|0x12)
 	if err != nil {
 		return err
 	}
 
 	// set final range signal rate limit to 0.25 MCPS (million counts per second)
-	err = v.SetSignalRateLimit(i2c, 0.25)
+	err = v.SetSignalRateLimit(0.25)
 	if err != nil {
 		return err
 	}
 
-	err = v.writeRegU8(i2c, SYSTEM_SEQUENCE_CONFIG, 0xFF)
+	err = v.i2c.WriteRegU8(SYSTEM_SEQUENCE_CONFIG, 0xFF)
 	if err != nil {
 		return err
 	}
@@ -414,7 +316,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 
 	// VL53L0X_StaticInit() begin
 
-	spadInfo, err := v.getSpadInfo(i2c)
+	spadInfo, err := v.getSpadInfo()
 	if err != nil {
 		return err
 	}
@@ -423,14 +325,15 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 	// the API, but the same data seems to be more easily readable from
 	// GLOBAL_CONFIG_SPAD_ENABLES_REF_0 through _6, so read it from there
 	spadMap := make([]byte, 6)
-	err = v.readRegBytes(i2c, GLOBAL_CONFIG_SPAD_ENABLES_REF_0, spadMap)
+	err = v.readRegBytes(GLOBAL_CONFIG_SPAD_ENABLES_REF_0, spadMap)
+	//err = v.i2c.ReadBytes(GLOBAL_CONFIG_SPAD_ENABLES_REF_0, spadMap)
 	if err != nil {
 		return err
 	}
 
 	// -- VL53L0X_set_reference_spads() begin (assume NVM values are valid)
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: DYNAMIC_SPAD_REF_EN_START_OFFSET, Value: 0x00},
 		{Reg: DYNAMIC_SPAD_NUM_REQUESTED_REF_SPAD, Value: 0x2C},
@@ -459,7 +362,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		}
 	}
 
-	err = v.writeBytes(i2c, GLOBAL_CONFIG_SPAD_ENABLES_REF_0, spadMap)
+	err = v.writeBytes(GLOBAL_CONFIG_SPAD_ENABLES_REF_0, spadMap)
 	if err != nil {
 		return err
 	}
@@ -469,7 +372,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 	// -- VL53L0X_load_tuning_settings() begin
 	// DefaultTuningSettings from vl53l0x_tuning.h
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x00, Value: 0x00},
 	}...)
@@ -477,7 +380,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x00},
 		{Reg: 0x09, Value: 0x00},
 		{Reg: 0x10, Value: 0x00},
@@ -487,7 +390,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0x24, Value: 0x01},
 		{Reg: 0x25, Value: 0xFF},
 		{Reg: 0x75, Value: 0x00},
@@ -496,7 +399,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x4E, Value: 0x2C},
 		{Reg: 0x48, Value: 0x00},
@@ -506,7 +409,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x00},
 		{Reg: 0x30, Value: 0x09},
 		{Reg: 0x54, Value: 0x00},
@@ -531,7 +434,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x22, Value: 0x32},
 		{Reg: 0x47, Value: 0x14},
@@ -542,7 +445,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x00},
 		{Reg: 0x7A, Value: 0x0A},
 		{Reg: 0x7B, Value: 0x00},
@@ -552,7 +455,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x23, Value: 0x34},
 		{Reg: 0x42, Value: 0x00},
@@ -568,7 +471,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x00},
 		{Reg: 0x34, Value: 0x03},
 		{Reg: 0x35, Value: 0x44},
@@ -577,7 +480,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x31, Value: 0x04},
 		{Reg: 0x4B, Value: 0x09},
@@ -588,7 +491,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x00},
 		{Reg: 0x44, Value: 0x00},
 		{Reg: 0x45, Value: 0x20},
@@ -605,7 +508,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x0D, Value: 0x01},
 	}...)
@@ -613,7 +516,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x00},
 		{Reg: 0x80, Value: 0x01},
 		{Reg: 0x01, Value: 0xF8},
@@ -622,7 +525,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 		return err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x8E, Value: 0x01},
 		{Reg: 0x00, Value: 0x01},
@@ -638,15 +541,15 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 	// "Set interrupt config to new sample ready"
 	// -- VL53L0X_SetGpioConfig() begin
 
-	err = v.writeRegU8(i2c, SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04)
+	err = v.i2c.WriteRegU8(SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04)
 	if err != nil {
 		return err
 	}
-	u8, err = v.readRegU8(i2c, GPIO_HV_MUX_ACTIVE_HIGH)
+	u8, err = v.i2c.ReadRegU8(GPIO_HV_MUX_ACTIVE_HIGH)
 	if err != nil {
 		return err
 	}
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: GPIO_HV_MUX_ACTIVE_HIGH, Value: u8 & ^byte(0x10)}, // active low
 		{Reg: SYSTEM_INTERRUPT_CLEAR, Value: 0x01},
 	}...)
@@ -656,7 +559,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 
 	// -- VL53L0X_SetGpioConfig() end
 
-	u32, err := v.getMeasurementTimingBudget(i2c)
+	u32, err := v.getMeasurementTimingBudget()
 	if err != nil {
 		return err
 	}
@@ -667,7 +570,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 	// TCC = Target CentreCheck
 	// -- VL53L0X_SetSequenceStepEnable() begin
 
-	err = v.writeRegU8(i2c, SYSTEM_SEQUENCE_CONFIG, 0xE8)
+	err = v.i2c.WriteRegU8(SYSTEM_SEQUENCE_CONFIG, 0xE8)
 	if err != nil {
 		return err
 	}
@@ -675,7 +578,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 	// -- VL53L0X_SetSequenceStepEnable() end
 
 	// "Recalculate timing budget"
-	err = v.SetMeasurementTimingBudget(i2c, v.measurementTimingBudgetUsec)
+	err = v.SetMeasurementTimingBudget(v.measurementTimingBudgetUsec)
 	if err != nil {
 		return err
 	}
@@ -686,11 +589,11 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 
 	// -- VL53L0X_perform_vhv_calibration() begin
 
-	err = v.writeRegU8(i2c, SYSTEM_SEQUENCE_CONFIG, 0x01)
+	err = v.i2c.WriteRegU8(SYSTEM_SEQUENCE_CONFIG, 0x01)
 	if err != nil {
 		return err
 	}
-	err = v.performSingleRefCalibration(i2c, 0x40)
+	err = v.performSingleRefCalibration(0x40)
 	if err != nil {
 		return err
 	}
@@ -699,11 +602,11 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 
 	// -- VL53L0X_perform_phase_calibration() begin
 
-	err = v.writeRegU8(i2c, SYSTEM_SEQUENCE_CONFIG, 0x02)
+	err = v.i2c.WriteRegU8(SYSTEM_SEQUENCE_CONFIG, 0x02)
 	if err != nil {
 		return err
 	}
-	err = v.performSingleRefCalibration(i2c, 0x00)
+	err = v.performSingleRefCalibration(0x00)
 	if err != nil {
 		return err
 	}
@@ -711,7 +614,7 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 	// -- VL53L0X_perform_phase_calibration() end
 
 	// "restore the previous Sequence Config"
-	err = v.writeRegU8(i2c, SYSTEM_SEQUENCE_CONFIG, 0xE8)
+	err = v.i2c.WriteRegU8(SYSTEM_SEQUENCE_CONFIG, 0xE8)
 	if err != nil {
 		return err
 	}
@@ -729,19 +632,19 @@ func (v *Vl53l0x) Init(i2c *i2c.I2C) error {
 // seems to increase the likelihood of getting an inaccurate reading because of
 // unwanted reflections from objects other than the intended target.
 // Defaults to 0.25 MCPS as initialized by the ST API and this library.
-func (v *Vl53l0x) SetSignalRateLimit(i2c *i2c.I2C, limitMcps float32) error {
+func (v *Vl53l0x) SetSignalRateLimit(limitMcps float32) error {
 	if limitMcps < 0 || limitMcps > 511.99 {
 		return errors.New("out of MCPS range")
 	}
 	// Q9.7 fixed point format (9 integer bits, 7 fractional bits)
-	err := v.writeRegU16(i2c, FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT,
+	err := v.i2c.WriteRegU16BE(FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT,
 		uint16(limitMcps*(1<<7)))
 	return err
 }
 
 // GetSignalRateLimit gets the return signal rate limit check value in MCPS.
-func (v *Vl53l0x) GetSignalRateLimit(i2c *i2c.I2C) (float32, error) {
-	u16, err := v.readRegU16(i2c, FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT)
+func (v *Vl53l0x) GetSignalRateLimit(i2c *i2c.Options) (float32, error) {
+	u16, err := v.i2c.ReadRegU16BE(FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT)
 	if err != nil {
 		return 0, err
 	}
@@ -775,11 +678,11 @@ type SequenceStepTimeouts struct {
 
 // Get sequence step enables.
 // Based on VL53L0X_GetSequenceStepEnables().
-func (v *Vl53l0x) getSequenceStepEnables(i2c *i2c.I2C) (*SequenceStepEnables, error) {
+func (v *Vl53l0x) getSequenceStepEnables() (*SequenceStepEnables, error) {
 
-	lg.Debug("Start getting sequence step enables")
+	v.i2c.Log.Debug("Start getting sequence step enables")
 
-	sequenceConfig, err := v.readRegU8(i2c, SYSTEM_SEQUENCE_CONFIG)
+	sequenceConfig, err := v.i2c.ReadRegU8(SYSTEM_SEQUENCE_CONFIG)
 	if err != nil {
 		return nil, err
 	}
@@ -834,14 +737,14 @@ func (v *Vl53l0x) timeoutMicrosecondsToMclks(timeoutPeriodUsec uint32, vcselPeri
 //  pre:  12 to 18 (initialized default: 14),
 //  final: 8 to 14 (initialized default: 10).
 // Based on VL53L0X_set_vcsel_pulse_period().
-func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodPclks uint8) error {
+func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.Options, tpe VcselPeriodType, periodPclks uint8) error {
 	vcselPeriodReg := v.encodeVcselPeriod(periodPclks)
 
-	enables, err := v.getSequenceStepEnables(i2c)
+	enables, err := v.getSequenceStepEnables()
 	if err != nil {
 		return err
 	}
-	timeouts, err := v.getSequenceStepTimeouts(i2c, *enables)
+	timeouts, err := v.getSequenceStepTimeouts(*enables)
 	if err != nil {
 		return err
 	}
@@ -862,22 +765,22 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 		// "Set phase check limits"
 		switch periodPclks {
 		case 12:
-			err := v.writeRegU8(i2c, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x18)
+			err := v.i2c.WriteRegU8(PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x18)
 			if err != nil {
 				return err
 			}
 		case 14:
-			err := v.writeRegU8(i2c, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x30)
+			err := v.i2c.WriteRegU8(PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x30)
 			if err != nil {
 				return err
 			}
 		case 16:
-			err := v.writeRegU8(i2c, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x40)
+			err := v.i2c.WriteRegU8(PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x40)
 			if err != nil {
 				return err
 			}
 		case 18:
-			err := v.writeRegU8(i2c, PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x50)
+			err := v.i2c.WriteRegU8(PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x50)
 			if err != nil {
 				return err
 			}
@@ -885,13 +788,13 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 			// invalid period
 			return errors.New("invalid period")
 		}
-		err = v.writeRegU8(i2c, PRE_RANGE_CONFIG_VALID_PHASE_LOW, 0x08)
+		err = v.i2c.WriteRegU8(PRE_RANGE_CONFIG_VALID_PHASE_LOW, 0x08)
 		if err != nil {
 			return err
 		}
 
 		// apply new VCSEL period
-		err = v.writeRegU8(i2c, PRE_RANGE_CONFIG_VCSEL_PERIOD, vcselPeriodReg)
+		err = v.i2c.WriteRegU8(PRE_RANGE_CONFIG_VCSEL_PERIOD, vcselPeriodReg)
 		if err != nil {
 			return err
 		}
@@ -904,7 +807,7 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 		newPreRangeTimeoutMclks := v.timeoutMicrosecondsToMclks(timeouts.PreRangeUsec,
 			uint16(periodPclks))
 
-		err = v.writeRegU16(i2c, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI,
+		err = v.i2c.WriteRegU16BE(PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI,
 			v.encodeTimeout(uint16(newPreRangeTimeoutMclks)))
 		if err != nil {
 			return err
@@ -923,7 +826,7 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 		} else {
 			newMsrcTimeoutMclks--
 		}
-		err = v.writeRegU8(i2c, MSRC_CONFIG_TIMEOUT_MACROP, uint8(newMsrcTimeoutMclks))
+		err = v.i2c.WriteRegU8(MSRC_CONFIG_TIMEOUT_MACROP, uint8(newMsrcTimeoutMclks))
 		if err != nil {
 			return err
 		}
@@ -932,7 +835,7 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 	} else if tpe == VcselPeriodFinalRange {
 		switch periodPclks {
 		case 8:
-			err := v.writeRegValues(i2c, []RegBytePair{
+			err := v.writeRegValues([]RegBytePair{
 				{Reg: FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, Value: 0x10},
 				{Reg: FINAL_RANGE_CONFIG_VALID_PHASE_LOW, Value: 0x08},
 				{Reg: GLOBAL_CONFIG_VCSEL_WIDTH, Value: 0x02},
@@ -945,7 +848,7 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 				return err
 			}
 		case 10:
-			err := v.writeRegValues(i2c, []RegBytePair{
+			err := v.writeRegValues([]RegBytePair{
 				{Reg: FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, Value: 0x28},
 				{Reg: FINAL_RANGE_CONFIG_VALID_PHASE_LOW, Value: 0x08},
 				{Reg: GLOBAL_CONFIG_VCSEL_WIDTH, Value: 0x03},
@@ -958,7 +861,7 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 				return err
 			}
 		case 12:
-			err := v.writeRegValues(i2c, []RegBytePair{
+			err := v.writeRegValues([]RegBytePair{
 				{Reg: FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, Value: 0x38},
 				{Reg: FINAL_RANGE_CONFIG_VALID_PHASE_LOW, Value: 0x08},
 				{Reg: GLOBAL_CONFIG_VCSEL_WIDTH, Value: 0x03},
@@ -971,7 +874,7 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 				return err
 			}
 		case 14:
-			err := v.writeRegValues(i2c, []RegBytePair{
+			err := v.writeRegValues([]RegBytePair{
 				{Reg: FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, Value: 0x48},
 				{Reg: FINAL_RANGE_CONFIG_VALID_PHASE_LOW, Value: 0x08},
 				{Reg: GLOBAL_CONFIG_VCSEL_WIDTH, Value: 0x03},
@@ -989,7 +892,7 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 		}
 
 		// apply new VCSEL period
-		err = v.writeRegU8(i2c, FINAL_RANGE_CONFIG_VCSEL_PERIOD, vcselPeriodReg)
+		err = v.i2c.WriteRegU8(FINAL_RANGE_CONFIG_VCSEL_PERIOD, vcselPeriodReg)
 		if err != nil {
 			return err
 		}
@@ -1011,7 +914,7 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 			newFinalRangeTimeoutMclks += uint32(timeouts.PreRangeMclks)
 		}
 
-		err = v.writeRegU16(i2c, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI,
+		err = v.i2c.WriteRegU16BE(FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI,
 			v.encodeTimeout(uint16(newFinalRangeTimeoutMclks)))
 		if err != nil {
 			return err
@@ -1025,7 +928,7 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 
 	// "Finally, the timing budget must be re-applied"
 
-	err = v.SetMeasurementTimingBudget(i2c, v.measurementTimingBudgetUsec)
+	err = v.SetMeasurementTimingBudget(v.measurementTimingBudgetUsec)
 	if err != nil {
 		return err
 	}
@@ -1033,19 +936,19 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 	// "Perform the phase calibration. This is needed after changing on vcsel period."
 	// VL53L0X_perform_phase_calibration() begin
 
-	sequenceConfig, err := v.readRegU8(i2c, SYSTEM_SEQUENCE_CONFIG)
+	sequenceConfig, err := v.i2c.ReadRegU8(SYSTEM_SEQUENCE_CONFIG)
 	if err != nil {
 		return err
 	}
-	err = v.writeRegU8(i2c, SYSTEM_SEQUENCE_CONFIG, 0x02)
+	err = v.i2c.WriteRegU8(SYSTEM_SEQUENCE_CONFIG, 0x02)
 	if err != nil {
 		return err
 	}
-	err = v.performSingleRefCalibration(i2c, 0x0)
+	err = v.performSingleRefCalibration(0x0)
 	if err != nil {
 		return err
 	}
-	err = v.writeRegU8(i2c, SYSTEM_SEQUENCE_CONFIG, sequenceConfig)
+	err = v.i2c.WriteRegU8(SYSTEM_SEQUENCE_CONFIG, sequenceConfig)
 	if err != nil {
 		return err
 	}
@@ -1057,19 +960,19 @@ func (v *Vl53l0x) SetVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType, periodP
 
 // Get the VCSEL pulse period in PCLKs for the given period type.
 // Based on VL53L0X_get_vcsel_pulse_period().
-func (v *Vl53l0x) getVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType) (byte, error) {
+func (v *Vl53l0x) getVcselPulsePeriod(tpe VcselPeriodType) (byte, error) {
 
-	lg.Debug("Start getting VCSEL pulse period")
+	v.i2c.Log.Debug("Start getting VCSEL pulse period")
 
 	switch tpe {
 	case VcselPeriodPreRange:
-		u8, err := v.readRegU8(i2c, PRE_RANGE_CONFIG_VCSEL_PERIOD)
+		u8, err := v.i2c.ReadRegU8(PRE_RANGE_CONFIG_VCSEL_PERIOD)
 		if err != nil {
 			return 0, err
 		}
 		return v.decodeVcselPeriod(u8), nil
 	case VcselPeriodFinalRange:
-		u8, err := v.readRegU8(i2c, FINAL_RANGE_CONFIG_VCSEL_PERIOD)
+		u8, err := v.i2c.ReadRegU8(FINAL_RANGE_CONFIG_VCSEL_PERIOD)
 		if err != nil {
 			return 0, err
 		}
@@ -1084,11 +987,11 @@ func (v *Vl53l0x) getVcselPulsePeriod(i2c *i2c.I2C, tpe VcselPeriodType) (byte, 
 // often as possible); otherwise, continuous timed mode is used, with the given
 // inter-measurement period in milliseconds determining how often the sensor
 // takes a measurement. Based on VL53L0X_StartMeasurement().
-func (v *Vl53l0x) StartContinuous(i2c *i2c.I2C, periodMs uint32) error {
+func (v *Vl53l0x) StartContinuous(i2c *i2c.Options, periodMs uint32) error {
 
-	lg.Debug("Start continuous")
+	i2c.Log.Debug("Start continuous")
 
-	err := v.writeRegValues(i2c, []RegBytePair{
+	err := v.writeRegValues([]RegBytePair{
 		{Reg: 0x80, Value: 0x01},
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x00, Value: 0x00},
@@ -1105,7 +1008,7 @@ func (v *Vl53l0x) StartContinuous(i2c *i2c.I2C, periodMs uint32) error {
 
 		// VL53L0X_SetInterMeasurementPeriodMilliSeconds() begin
 
-		oscCalibrateVal, err := v.readRegU16(i2c, OSC_CALIBRATE_VAL)
+		oscCalibrateVal, err := v.i2c.ReadRegU16BE(OSC_CALIBRATE_VAL)
 		if err != nil {
 			return err
 		}
@@ -1114,20 +1017,20 @@ func (v *Vl53l0x) StartContinuous(i2c *i2c.I2C, periodMs uint32) error {
 			periodMs *= uint32(oscCalibrateVal)
 		}
 
-		err = v.writeRegU32(i2c, SYSTEM_INTERMEASUREMENT_PERIOD, periodMs)
+		err = v.writeRegU32(SYSTEM_INTERMEASUREMENT_PERIOD, periodMs)
 		if err != nil {
 			return err
 		}
 
 		// VL53L0X_SetInterMeasurementPeriodMilliSeconds() end
 
-		err = v.writeRegU8(i2c, SYSRANGE_START, 0x04) // VL53L0X_REG_SYSRANGE_MODE_TIMED
+		err = v.i2c.WriteRegU8(SYSRANGE_START, 0x04) // VL53L0X_REG_SYSRANGE_MODE_TIMED
 		if err != nil {
 			return err
 		}
 	} else {
 		// continuous back-to-back mode
-		err = v.writeRegU8(i2c, SYSRANGE_START, 0x02) // VL53L0X_REG_SYSRANGE_MODE_BACKTOBACK
+		err = v.i2c.WriteRegU8(SYSRANGE_START, 0x02) // VL53L0X_REG_SYSRANGE_MODE_BACKTOBACK
 		if err != nil {
 			return err
 		}
@@ -1137,11 +1040,11 @@ func (v *Vl53l0x) StartContinuous(i2c *i2c.I2C, periodMs uint32) error {
 
 // StopContinuous stop continuous measurements.
 // Based on VL53L0X_StopMeasurement().
-func (v *Vl53l0x) StopContinuous(i2c *i2c.I2C) error {
+func (v *Vl53l0x) StopContinuous(i2c *i2c.Options) error {
 
-	lg.Debug("Stop continuous")
+	i2c.Log.Debug("Stop continuous")
 
-	err := v.writeRegValues(i2c, []RegBytePair{
+	err := v.writeRegValues([]RegBytePair{
 		{Reg: SYSRANGE_START, Value: 0x01}, // VL53L0X_REG_SYSRANGE_MODE_SINGLESHOT
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x00, Value: 0x00},
@@ -1153,9 +1056,9 @@ func (v *Vl53l0x) StopContinuous(i2c *i2c.I2C) error {
 }
 
 // Read measured distance from the sensor.
-func (v *Vl53l0x) readRangeMillimeters(i2c *i2c.I2C) (uint16, error) {
+func (v *Vl53l0x) readRangeMillimeters(i2c *i2c.Options) (uint16, error) {
 
-	err := v.waitUntilOrTimeout(i2c, RESULT_INTERRUPT_STATUS,
+	err := v.waitUntilOrTimeout(RESULT_INTERRUPT_STATUS,
 		func(checkReg byte, err error) (bool, error) {
 			return checkReg&0x07 != 0, err
 		})
@@ -1165,11 +1068,11 @@ func (v *Vl53l0x) readRangeMillimeters(i2c *i2c.I2C) (uint16, error) {
 
 	// assumptions: Linearity Corrective Gain is 1000 (default);
 	// fractional ranging is not enabled
-	rng, err := v.readRegU16(i2c, RESULT_RANGE_STATUS+10)
+	rng, err := v.i2c.ReadRegU16BE(RESULT_RANGE_STATUS + 10)
 	if err != nil {
 		return 0, err
 	}
-	err = v.writeRegU8(i2c, SYSTEM_INTERRUPT_CLEAR, 0x01)
+	err = v.i2c.WriteRegU8(SYSTEM_INTERRUPT_CLEAR, 0x01)
 	if err != nil {
 		return 0, err
 	}
@@ -1180,20 +1083,20 @@ func (v *Vl53l0x) readRangeMillimeters(i2c *i2c.I2C) (uint16, error) {
 // ReadRangeContinuousMillimeters returns a range reading in millimeters
 // when continuous mode is active (readRangeSingleMillimeters() also calls
 // this function after starting a single-shot range measurement).
-func (v *Vl53l0x) ReadRangeContinuousMillimeters(i2c *i2c.I2C) (uint16, error) {
+func (v *Vl53l0x) ReadRangeContinuousMillimeters(i2c *i2c.Options) (uint16, error) {
 
-	lg.Debug("Read range continuous")
+	i2c.Log.Debug("Read range continuous")
 
 	return v.readRangeMillimeters(i2c)
 }
 
 // ReadRangeSingleMillimeters performs a single-shot range measurement and returns the reading in
 // millimeters based on VL53L0X_PerformSingleRangingMeasurement().
-func (v *Vl53l0x) ReadRangeSingleMillimeters(i2c *i2c.I2C) (uint16, error) {
+func (v *Vl53l0x) ReadRangeSingleMillimeters(i2c *i2c.Options) (uint16, error) {
 
-	lg.Debug("Read range single")
+	i2c.Log.Debug("Read range single")
 
-	err := v.writeRegValues(i2c, []RegBytePair{
+	err := v.writeRegValues([]RegBytePair{
 		{Reg: 0x80, Value: 0x01},
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x00, Value: 0x00},
@@ -1208,7 +1111,7 @@ func (v *Vl53l0x) ReadRangeSingleMillimeters(i2c *i2c.I2C) (uint16, error) {
 	}
 
 	// "Wait until start bit has been cleared"
-	err = v.waitUntilOrTimeout(i2c, SYSRANGE_START,
+	err = v.waitUntilOrTimeout(SYSRANGE_START,
 		func(checkReg byte, err error) (bool, error) {
 			return checkReg&0x01 == 0, err
 		})
@@ -1251,19 +1154,19 @@ func (v *Vl53l0x) encodeTimeout(timeoutMclks uint16) uint16 {
 // based on get_sequence_step_timeout(),
 // but gets all timeouts instead of just the requested one, and also stores
 // intermediate values.
-func (v *Vl53l0x) getSequenceStepTimeouts(i2c *i2c.I2C, enables SequenceStepEnables) (*SequenceStepTimeouts, error) {
+func (v *Vl53l0x) getSequenceStepTimeouts(enables SequenceStepEnables) (*SequenceStepTimeouts, error) {
 
-	lg.Debug("Start getting sequence step timeouts")
+	v.i2c.Log.Debug("Start getting sequence step timeouts")
 
 	timeouts := &SequenceStepTimeouts{}
 
-	u8, err := v.getVcselPulsePeriod(i2c, VcselPeriodPreRange)
+	u8, err := v.getVcselPulsePeriod(VcselPeriodPreRange)
 	if err != nil {
 		return nil, err
 	}
 	timeouts.PreRangeVcselPeriodPclks = uint16(u8)
 
-	u8, err = v.readRegU8(i2c, MSRC_CONFIG_TIMEOUT_MACROP)
+	u8, err = v.i2c.ReadRegU8(MSRC_CONFIG_TIMEOUT_MACROP)
 	if err != nil {
 		return nil, err
 	}
@@ -1272,7 +1175,7 @@ func (v *Vl53l0x) getSequenceStepTimeouts(i2c *i2c.I2C, enables SequenceStepEnab
 	timeouts.MsrcDssTccUsec = v.timeoutMclksToMicroseconds(timeouts.MsrcDssTccMclks,
 		timeouts.PreRangeVcselPeriodPclks)
 
-	u16, err := v.readRegU16(i2c, PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI)
+	u16, err := v.i2c.ReadRegU16BE(PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI)
 	if err != nil {
 		return nil, err
 	}
@@ -1281,13 +1184,13 @@ func (v *Vl53l0x) getSequenceStepTimeouts(i2c *i2c.I2C, enables SequenceStepEnab
 	timeouts.PreRangeUsec = v.timeoutMclksToMicroseconds(timeouts.PreRangeMclks,
 		timeouts.PreRangeVcselPeriodPclks)
 
-	u8, err = v.getVcselPulsePeriod(i2c, VcselPeriodFinalRange)
+	u8, err = v.getVcselPulsePeriod(VcselPeriodFinalRange)
 	if err != nil {
 		return nil, err
 	}
 	timeouts.FinalRangeVcselPeriodPclks = uint16(u8)
 
-	u16, err = v.readRegU16(i2c, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI)
+	u16, err = v.i2c.ReadRegU16BE(FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI)
 	if err != nil {
 		return nil, err
 	}
@@ -1310,7 +1213,7 @@ func (v *Vl53l0x) getSequenceStepTimeouts(i2c *i2c.I2C, enables SequenceStepEnab
 // factor of N decreases the range measurement standard deviation by a factor of
 // sqrt(N). Defaults to about 33 milliseconds; the minimum is 20 ms.
 // Based on VL53L0X_set_measurement_timing_budget_micro_seconds().
-func (v *Vl53l0x) SetMeasurementTimingBudget(i2c *i2c.I2C, budgetUsec uint32) error {
+func (v *Vl53l0x) SetMeasurementTimingBudget(budgetUsec uint32) error {
 	const StartOverhead = 1320 // note that this is different than the value in get_
 	const EndOverhead = 960
 	const MsrcOverhead = 660
@@ -1321,23 +1224,23 @@ func (v *Vl53l0x) SetMeasurementTimingBudget(i2c *i2c.I2C, budgetUsec uint32) er
 
 	const MinTimingBudget = 20000
 
-	lg.Debug("Start setting measurement timing budget")
+	v.i2c.Log.Debug("Start setting measurement timing budget")
 
 	if budgetUsec < MinTimingBudget {
 		return errors.New("budget is lower than minimum allowed")
 	}
 	var usedBudgetUsec uint32 = StartOverhead + EndOverhead
 
-	enables, err := v.getSequenceStepEnables(i2c)
+	enables, err := v.getSequenceStepEnables()
 	if err != nil {
 		return err
 	}
-	lg.Debugf("Sequence step enables = %#v", enables)
-	timeouts, err := v.getSequenceStepTimeouts(i2c, *enables)
+	v.i2c.Log.Debugf("Sequence step enables = %#v", enables)
+	timeouts, err := v.getSequenceStepTimeouts(*enables)
 	if err != nil {
 		return err
 	}
-	lg.Debugf("Sequence step timeouts = %#v", timeouts)
+	v.i2c.Log.Debugf("Sequence step timeouts = %#v", timeouts)
 
 	if enables.TCC {
 		usedBudgetUsec += timeouts.MsrcDssTccUsec + TccOverhead
@@ -1377,7 +1280,7 @@ func (v *Vl53l0x) SetMeasurementTimingBudget(i2c *i2c.I2C, budgetUsec uint32) er
 		//  timeouts must be expressed in macro periods MClks
 		//  because they have different vcsel periods."
 
-		lg.Debug("set_sequence_step_timeout() begin")
+		v.i2c.Log.Debug("set_sequence_step_timeout() begin")
 
 		finalRangeTimeoutMclks := v.timeoutMicrosecondsToMclks(finalRangeTimeoutUsec,
 			timeouts.FinalRangeVcselPeriodPclks)
@@ -1386,20 +1289,20 @@ func (v *Vl53l0x) SetMeasurementTimingBudget(i2c *i2c.I2C, budgetUsec uint32) er
 			finalRangeTimeoutMclks += uint32(timeouts.PreRangeMclks)
 		}
 
-		err = v.writeRegU16(i2c, FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI,
+		err = v.i2c.WriteRegU16BE(FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI,
 			v.encodeTimeout(uint16(finalRangeTimeoutMclks)))
 		if err != nil {
 			return err
 		}
 
-		lg.Debug("set_sequence_step_timeout() end")
+		v.i2c.Log.Debug("set_sequence_step_timeout() end")
 
 		// set_sequence_step_timeout() end
 
 		v.measurementTimingBudgetUsec = budgetUsec // store for internal reuse
 	}
 
-	lg.Debug("End setting measurement timing budget")
+	v.i2c.Log.Debug("End setting measurement timing budget")
 
 	return nil
 }
@@ -1407,7 +1310,7 @@ func (v *Vl53l0x) SetMeasurementTimingBudget(i2c *i2c.I2C, budgetUsec uint32) er
 // Get the measurement timing budget in microseconds
 // based on VL53L0X_get_measurement_timing_budget_micro_seconds()
 // in us (microseconds).
-func (v *Vl53l0x) getMeasurementTimingBudget(i2c *i2c.I2C) (uint32, error) {
+func (v *Vl53l0x) getMeasurementTimingBudget() (uint32, error) {
 	const StartOverhead = 1910 // note that this is different than the value in set_
 	const EndOverhead = 960
 	const MsrcOverhead = 660
@@ -1418,11 +1321,11 @@ func (v *Vl53l0x) getMeasurementTimingBudget(i2c *i2c.I2C) (uint32, error) {
 
 	var budgetUsec uint32 = StartOverhead + EndOverhead
 
-	enables, err := v.getSequenceStepEnables(i2c)
+	enables, err := v.getSequenceStepEnables()
 	if err != nil {
 		return 0, err
 	}
-	timeouts, err := v.getSequenceStepTimeouts(i2c, *enables)
+	timeouts, err := v.getSequenceStepTimeouts(*enables)
 	if err != nil {
 		return 0, err
 	}
@@ -1460,10 +1363,10 @@ type SpadInfo struct {
 // Get reference SPAD (single photon avalanche diode) count and type
 // based on VL53L0X_get_info_from_device(),
 // but only gets reference SPAD count and type.
-func (v *Vl53l0x) getSpadInfo(i2c *i2c.I2C) (*SpadInfo, error) {
+func (v *Vl53l0x) getSpadInfo() (*SpadInfo, error) {
 	var tmp uint8
 
-	err := v.writeRegValues(i2c, []RegBytePair{
+	err := v.writeRegValues([]RegBytePair{
 		{Reg: 0x80, Value: 0x01},
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x00, Value: 0x00},
@@ -1472,15 +1375,15 @@ func (v *Vl53l0x) getSpadInfo(i2c *i2c.I2C) (*SpadInfo, error) {
 		return nil, err
 	}
 
-	err = v.writeRegU8(i2c, 0xFF, 0x06)
+	err = v.i2c.WriteRegU8(0xFF, 0x06)
 	if err != nil {
 		return nil, err
 	}
-	u8, err := v.readRegU8(i2c, 0x83)
+	u8, err := v.i2c.ReadRegU8(0x83)
 	if err != nil {
 		return nil, err
 	}
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0x83, Value: u8 | 0x04},
 		{Reg: 0xFF, Value: 0x07},
 		{Reg: 0x81, Value: 0x01},
@@ -1489,48 +1392,48 @@ func (v *Vl53l0x) getSpadInfo(i2c *i2c.I2C) (*SpadInfo, error) {
 		return nil, err
 	}
 
-	err = v.writeRegU8(i2c, 0x80, 0x01)
+	err = v.i2c.WriteRegU8(0x80, 0x01)
 	if err != nil {
 		return nil, err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0x94, Value: 0x6b},
 		{Reg: 0x83, Value: 0x00},
 	}...)
 	if err != nil {
 		return nil, err
 	}
-	err = v.waitUntilOrTimeout(i2c, 0x83,
+	err = v.waitUntilOrTimeout(0x83,
 		func(checkReg byte, err error) (bool, error) {
 			return checkReg != 0, err
 		})
 	if err != nil {
 		return nil, err
 	}
-	err = v.writeRegU8(i2c, 0x83, 0x01)
+	err = v.i2c.WriteRegU8(0x83, 0x01)
 	if err != nil {
 		return nil, err
 	}
-	tmp, err = v.readRegU8(i2c, 0x92)
+	tmp, err = v.i2c.ReadRegU8(0x92)
 	if err != nil {
 		return nil, err
 	}
 
 	si := &SpadInfo{Count: tmp & 0x7F, TypeIsAperture: (tmp>>7)&0x01 != 0}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0x81, Value: 0x00},
 		{Reg: 0xFF, Value: 0x06},
 	}...)
 	if err != nil {
 		return nil, err
 	}
-	u8, err = v.readRegU8(i2c, 0x83)
+	u8, err = v.i2c.ReadRegU8(0x83)
 	if err != nil {
 		return nil, err
 	}
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0x83, Value: u8 & ^byte(0x04)},
 		{Reg: 0xFF, Value: 0x01},
 		{Reg: 0x00, Value: 0x01},
@@ -1539,7 +1442,7 @@ func (v *Vl53l0x) getSpadInfo(i2c *i2c.I2C) (*SpadInfo, error) {
 		return nil, err
 	}
 
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: 0xFF, Value: 0x00},
 		{Reg: 0x80, Value: 0x00},
 	}...)
@@ -1551,19 +1454,19 @@ func (v *Vl53l0x) getSpadInfo(i2c *i2c.I2C) (*SpadInfo, error) {
 }
 
 // Based on VL53L0X_perform_single_ref_calibration().
-func (v *Vl53l0x) performSingleRefCalibration(i2c *i2c.I2C, vhvInitByte uint8) error {
-	err := v.writeRegU8(i2c, SYSRANGE_START, 0x01|vhvInitByte) // VL53L0X_REG_SYSRANGE_MODE_START_STOP
+func (v *Vl53l0x) performSingleRefCalibration(vhvInitByte uint8) error {
+	err := v.i2c.WriteRegU8(SYSRANGE_START, 0x01|vhvInitByte) // VL53L0X_REG_SYSRANGE_MODE_START_STOP
 	if err != nil {
 		return err
 	}
-	err = v.waitUntilOrTimeout(i2c, RESULT_INTERRUPT_STATUS,
+	err = v.waitUntilOrTimeout(RESULT_INTERRUPT_STATUS,
 		func(checkReg byte, err error) (bool, error) {
 			return checkReg&0x07 != 0, err
 		})
 	if err != nil {
 		return err
 	}
-	err = v.writeRegValues(i2c, []RegBytePair{
+	err = v.writeRegValues([]RegBytePair{
 		{Reg: SYSTEM_INTERRUPT_CLEAR, Value: 0x01},
 		{Reg: SYSRANGE_START, Value: 0x00},
 	}...)
@@ -1586,18 +1489,16 @@ func (v *Vl53l0x) startTimeout() time.Time {
 
 // Raise timeout event if execution time exceed value in Vl53l0x.ioTimeout.
 func (v *Vl53l0x) checkTimeoutExpired(startTime time.Time) bool {
-	left := time.Now().Sub(startTime)
+	left := time.Since(startTime)
 	return v.ioTimeout > 0 && left > v.ioTimeout
 }
 
 // Read specific register in the loop until condition is true,
 // or wait for timeout event.
-func (v *Vl53l0x) waitUntilOrTimeout(i2c *i2c.I2C, reg byte,
-	breakWhen func(chechReg byte, err error) (bool, error)) error {
-
+func (v *Vl53l0x) waitUntilOrTimeout(reg byte, breakWhen func(chechReg byte, err error) (bool, error)) error {
 	st := v.startTimeout()
 	for {
-		u8, err := v.readRegU8(i2c, reg)
+		u8, err := v.i2c.ReadRegU8(reg)
 		f, err2 := breakWhen(u8, err)
 		if err2 != nil {
 			return err2
@@ -1612,30 +1513,30 @@ func (v *Vl53l0x) waitUntilOrTimeout(i2c *i2c.I2C, reg byte,
 }
 
 // Write an 8-bit register.
-func (v *Vl53l0x) writeRegU8(i2c *i2c.I2C, reg byte, value uint8) error {
+/*func (v *Vl53l0x) writeRegU8(i2c *i2c.Options, reg byte, value uint8) error {
 	return i2c.WriteRegU8(reg, value)
 }
 
 // Write a 16-bit register.
-func (v *Vl53l0x) writeRegU16(i2c *i2c.I2C, reg byte, value uint16) error {
+func (v *Vl53l0x) writeRegU16(i2c *i2c.Options, reg byte, value uint16) error {
 	buf := []byte{reg, byte(value >> 8 & 0xFF), byte(value & 0xFF)}
 	_, err := i2c.WriteBytes(buf)
 	return err
-}
+}*/
 
 // Write a 32-bit register.
-func (v *Vl53l0x) writeRegU32(i2c *i2c.I2C, reg byte, value uint32) error {
+func (v *Vl53l0x) writeRegU32(reg byte, value uint32) error {
 	buf := []byte{reg, byte(value >> 24 & 0xFF), byte(value >> 16 & 0xFF),
 		byte(value >> 8 & 0xFF), byte(value & 0xFF)}
-	_, err := i2c.WriteBytes(buf)
+	_, err := v.i2c.WriteBytes(buf)
 	return err
 }
 
 // Write an arbitrary number of bytes from the given array to the sensor,
 // starting at the given register.
-func (v *Vl53l0x) writeBytes(i2c *i2c.I2C, reg byte, buf []byte) error {
+func (v *Vl53l0x) writeBytes(reg byte, buf []byte) error {
 	b := append([]byte{reg}, buf...)
-	_, err := i2c.WriteBytes(b)
+	_, err := v.i2c.WriteBytes(b)
 	return err
 }
 
@@ -1648,9 +1549,9 @@ type RegBytePair struct {
 }
 
 // Write bunch of registers with with corresponding values.
-func (v *Vl53l0x) writeRegValues(i2c *i2c.I2C, pairs ...RegBytePair) error {
+func (v *Vl53l0x) writeRegValues(pairs ...RegBytePair) error {
 	for _, pair := range pairs {
-		err := v.writeRegU8(i2c, pair.Reg, pair.Value)
+		err := v.i2c.WriteRegU8(pair.Reg, pair.Value)
 		if err != nil {
 			return err
 		}
@@ -1659,13 +1560,13 @@ func (v *Vl53l0x) writeRegValues(i2c *i2c.I2C, pairs ...RegBytePair) error {
 }
 
 // Read an 8-bit register.
-func (v *Vl53l0x) readRegU8(i2c *i2c.I2C, reg byte) (uint8, error) {
+/*func (v *Vl53l0x) readRegU8(i2c *i2c.Options, reg byte) (uint8, error) {
 	u8, err := i2c.ReadRegU8(reg)
 	return u8, err
-}
+}*/
 
 // Read a 16-bit register.
-func (v *Vl53l0x) readRegU16(i2c *i2c.I2C, reg byte) (uint16, error) {
+/*func (v *Vl53l0x) readRegU16(i2c *i2c.Options, reg byte) (uint16, error) {
 	_, err := i2c.WriteBytes([]byte{reg})
 	if err != nil {
 		return 0, err
@@ -1677,10 +1578,10 @@ func (v *Vl53l0x) readRegU16(i2c *i2c.I2C, reg byte) (uint16, error) {
 	}
 	u16 := uint16(buf[0])<<8 | uint16(buf[1])
 	return u16, nil
-}
+}*/
 
 // Read a 32-bit register.
-func (v *Vl53l0x) readRegU32(i2c *i2c.I2C, reg byte) (uint32, error) {
+/*func (v *Vl53l0x) readRegU32(i2c *i2c.Options, reg byte) (uint32, error) {
 	_, err := i2c.WriteBytes([]byte{reg})
 	if err != nil {
 		return 0, err
@@ -1693,15 +1594,15 @@ func (v *Vl53l0x) readRegU32(i2c *i2c.I2C, reg byte) (uint32, error) {
 	u32 := uint32(buf[0])<<24 | uint32(buf[1])<<16 |
 		uint32(buf[2])<<8 | uint32(buf[3])
 	return u32, nil
-}
+}*/
 
 // Read an arbitrary number of bytes from the sensor, starting at the given
 // register, into the given array.
-func (v *Vl53l0x) readRegBytes(i2c *i2c.I2C, reg byte, dest []byte) error {
-	_, err := i2c.WriteBytes([]byte{reg})
+func (v *Vl53l0x) readRegBytes(reg byte, dest []byte) error {
+	_, err := v.i2c.WriteBytes([]byte{reg})
 	if err != nil {
 		return err
 	}
-	_, err = i2c.ReadBytes(dest)
+	_, err = v.i2c.ReadBytes(dest)
 	return err
 }
