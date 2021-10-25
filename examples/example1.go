@@ -4,16 +4,17 @@ import (
 	"context"
 	"os"
 	"syscall"
+	"vl53l0x"
 
 	shell "github.com/d2r2/go-shell"
-	"github.com/d2r2/go-vl53l0x"
+
 	"github.com/googolgl/go-i2c"
 )
 
 func main() {
 	// Create new connection to i2c-bus on 1 line with address 0x40.
 	// Use i2cdetect utility to find device address over the i2c-bus
-	i2c, err := i2c.New(0x29, 0)
+	i2c, err := i2c.New(0x29, "/dev/i2c-0")
 	if err != nil {
 		i2c.Log.Fatal(err)
 	}
@@ -33,13 +34,13 @@ func main() {
 	i2c.Log.Infoln("**********************************************************************************************")
 	i2c.Log.Infoln("*** Reset/initialize sensor")
 	i2c.Log.Infoln("**********************************************************************************************")
-	err = sensor.Reset(i2c)
+	err = sensor.Reset()
 	if err != nil {
 		i2c.Log.Fatalf("Error reseting sensor: %s", err)
 	}
 	// It's highly recommended to reset sensor before repeated initialization.
 	// By default, sensor initialized with "RegularRange" and "RegularAccuracy" parameters.
-	err = sensor.Init(i2c)
+	err = sensor.Init()
 	if err != nil {
 		i2c.Log.Fatalf("Failed to initialize sensor: %s", err)
 	}
@@ -53,9 +54,8 @@ func main() {
 	i2c.Log.Infoln("*** Сonfigure sensor")
 	i2c.Log.Infoln("**********************************************************************************************")
 	rngConfig := vl53l0x.RegularRange
-	speedConfig := vl53l0x.GoodAccuracy
-	i2c.Log.Infof("Configure sensor with  %q and %q",
-		rngConfig, speedConfig)
+	speedConfig := vl53l0x.HighAccuracy
+	i2c.Log.Infof("Configure sensor with  %q and %q", rngConfig, speedConfig)
 	err = sensor.Config(i2c, rngConfig, speedConfig)
 	if err != nil {
 		i2c.Log.Fatalf("Failed to initialize sensor: %s", err)
@@ -73,8 +73,8 @@ func main() {
 	i2c.Log.Infoln("**********************************************************************************************")
 	i2c.Log.Infoln("*** Continuous shot range measurement mode")
 	i2c.Log.Infoln("**********************************************************************************************")
-	var freq uint32 = 100
-	times := 20
+	var freq uint32 = 20
+	times := 50
 	i2c.Log.Infof("Made measurement each %d milliseconds, %d times", freq, times)
 	err = sensor.StartContinuous(i2c, freq)
 	if err != nil {
@@ -120,8 +120,7 @@ func main() {
 	i2c.Log.Infoln("**********************************************************************************************")
 	rngConfig = vl53l0x.RegularRange
 	speedConfig = vl53l0x.RegularAccuracy
-	i2c.Log.Infof("Reconfigure sensor with %q and %q",
-		rngConfig, speedConfig)
+	i2c.Log.Infof("Reconfigure sensor with %q and %q", rngConfig, speedConfig)
 	err = sensor.Config(i2c, rngConfig, speedConfig)
 	if err != nil {
 		i2c.Log.Fatalf("Failed to initialize sensor: %s", err)

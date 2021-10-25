@@ -246,7 +246,7 @@ func (v *Vl53l0x) SetAddress(i2cRef **i2c.Options, newAddr byte) error {
 	if err != nil {
 		return err
 	}
-	*i2cRef, err = i2c.New(newAddr, (*i2cRef).GetBus())
+	*i2cRef, err = i2c.New(newAddr, (*i2cRef).GetDev())
 	return err
 }
 
@@ -1017,7 +1017,7 @@ func (v *Vl53l0x) StartContinuous(i2c *i2c.Options, periodMs uint32) error {
 			periodMs *= uint32(oscCalibrateVal)
 		}
 
-		err = v.writeRegU32(SYSTEM_INTERMEASUREMENT_PERIOD, periodMs)
+		err = v.i2c.WriteRegU32BE(SYSTEM_INTERMEASUREMENT_PERIOD, periodMs)
 		if err != nil {
 			return err
 		}
@@ -1512,26 +1512,6 @@ func (v *Vl53l0x) waitUntilOrTimeout(reg byte, breakWhen func(chechReg byte, err
 	return nil
 }
 
-// Write an 8-bit register.
-/*func (v *Vl53l0x) writeRegU8(i2c *i2c.Options, reg byte, value uint8) error {
-	return i2c.WriteRegU8(reg, value)
-}
-
-// Write a 16-bit register.
-func (v *Vl53l0x) writeRegU16(i2c *i2c.Options, reg byte, value uint16) error {
-	buf := []byte{reg, byte(value >> 8 & 0xFF), byte(value & 0xFF)}
-	_, err := i2c.WriteBytes(buf)
-	return err
-}*/
-
-// Write a 32-bit register.
-func (v *Vl53l0x) writeRegU32(reg byte, value uint32) error {
-	buf := []byte{reg, byte(value >> 24 & 0xFF), byte(value >> 16 & 0xFF),
-		byte(value >> 8 & 0xFF), byte(value & 0xFF)}
-	_, err := v.i2c.WriteBytes(buf)
-	return err
-}
-
 // Write an arbitrary number of bytes from the given array to the sensor,
 // starting at the given register.
 func (v *Vl53l0x) writeBytes(reg byte, buf []byte) error {
@@ -1558,43 +1538,6 @@ func (v *Vl53l0x) writeRegValues(pairs ...RegBytePair) error {
 	}
 	return nil
 }
-
-// Read an 8-bit register.
-/*func (v *Vl53l0x) readRegU8(i2c *i2c.Options, reg byte) (uint8, error) {
-	u8, err := i2c.ReadRegU8(reg)
-	return u8, err
-}*/
-
-// Read a 16-bit register.
-/*func (v *Vl53l0x) readRegU16(i2c *i2c.Options, reg byte) (uint16, error) {
-	_, err := i2c.WriteBytes([]byte{reg})
-	if err != nil {
-		return 0, err
-	}
-	var buf [2]byte
-	_, err = i2c.ReadBytes(buf[0:])
-	if err != nil {
-		return 0, err
-	}
-	u16 := uint16(buf[0])<<8 | uint16(buf[1])
-	return u16, nil
-}*/
-
-// Read a 32-bit register.
-/*func (v *Vl53l0x) readRegU32(i2c *i2c.Options, reg byte) (uint32, error) {
-	_, err := i2c.WriteBytes([]byte{reg})
-	if err != nil {
-		return 0, err
-	}
-	var buf [4]byte
-	_, err = i2c.ReadBytes(buf[0:])
-	if err != nil {
-		return 0, err
-	}
-	u32 := uint32(buf[0])<<24 | uint32(buf[1])<<16 |
-		uint32(buf[2])<<8 | uint32(buf[3])
-	return u32, nil
-}*/
 
 // Read an arbitrary number of bytes from the sensor, starting at the given
 // register, into the given array.

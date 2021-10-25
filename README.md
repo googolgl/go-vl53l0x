@@ -23,13 +23,13 @@ Golang usage
 func main() {
     // Create new connection to i2c-bus on 0 line with address 0x29.
     // Use i2cdetect utility to find device address over the i2c-bus
-    i2c, err := i2c.NewI2C(0x29, 0)
+    i2c, err := i2c.New(0x29, "/dev/i2c-0")
     if err != nil {
         log.Fatal(err)
     }
     defer i2c.Close()
 
-    sensor := vl53l0x.NewVl53l0x()
+    sensor := vl53l0x.New()
     // It's highly recommended to reset sensor each time before repeated initialization.
     err = sensor.Reset(i2c)
     if err != nil {
