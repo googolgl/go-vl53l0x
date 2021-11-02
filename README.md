@@ -61,6 +61,28 @@ Installation
 $ go get -u github.com/d2r2/go-vl53l0x
 ```
 
+Connecting Multiple Sensors
+------------
+
+I2C only allows one address-per-device so you have to make sure each I2C device has a unique address.
+The default address for the VL53L0X is 0x29 but you can change this in software.
+To set the new address you can do it one of two ways. During initialization, instead of calling lox.begin(),
+call lox.begin(0x30) to set the address to 0x30. Or you can, later, call lox.setAddress(0x30) at any time.
+The good news is its easy to change, the annoying part is each other sensor has to be in shutdown. You
+can shutdown each sensor by wiring up to the XSHUT pin to a microcontroller pin. Then perform
+something like this pseudo-code:
+1. Reset all sensors by setting all of their XSHUT pins low for delay(10), then set all XSHUT high to bring
+out of reset
+2. Keep sensor #1 awake by keeping XSHUT pin high
+3. Put all other sensors into shutdown by pulling XSHUT pins low
+4. Initialize sensor #1 with lox.begin( new_i2c_address) Pick any number but 0x29 and it must be under
+0x7F. Going with 0x30 to 0x3F is probably OK.
+5. Keep sensor #1 awake, and now bring sensor #2 out of reset by setting its XSHUT pin high.
+6. Initialize sensor #2 with lox.begin( new_i2c_address) Pick any number but 0x29 and whatever you
+set the first sensor to
+7. Repeat for each sensor, turning each one on, setting a unique address.
+Note you must do this every time you turn on the power, the addresses are not permanent!
+
 
 Troubleshooting
 ---------------
