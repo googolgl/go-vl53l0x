@@ -1,4 +1,4 @@
-module vl53l0x
+module github.com/googolgl/go-vl53l0x
 
 go 1.17
 
