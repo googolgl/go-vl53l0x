@@ -1,9 +1,10 @@
 module vl53l0x
 
-go 1.16
+go 1.17
+
+require github.com/googolgl/go-i2c v0.1.1
 
 require (
-	github.com/d2r2/go-shell v0.0.0-20191113051817-7664ea33645f
-	github.com/davecgh/go-spew v1.1.1
-	github.com/googolgl/go-i2c v0.1.1
+	github.com/sirupsen/logrus v1.8.1 // indirect
+	golang.org/x/sys v0.0.0-20211015200801-69063c4bb744 // indirect
 )

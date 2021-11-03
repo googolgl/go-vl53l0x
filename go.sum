@@ -1,5 +1,3 @@
-github.com/d2r2/go-shell v0.0.0-20191113051817-7664ea33645f h1:VrZEIdW45kHrPChbu4fvZnolG9l9Wu70znnLQUY/yFg=
-github.com/d2r2/go-shell v0.0.0-20191113051817-7664ea33645f/go.mod h1:FdrNob+jQ3UkEpNVeZFVn8mW86Aa2wa6U5z0vGQOEXQ=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/googolgl/go-i2c v0.1.1 h1:hlZ8xrclV9k5uZ9OnVL7D/Jt1ku25c3JC89JlVtkGGs=

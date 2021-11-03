@@ -14,9 +14,9 @@ package vl53l0x
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/googolgl/go-i2c"
 )
 
@@ -1505,7 +1505,7 @@ func (e *Entity) waitUntilOrTimeout(reg byte, breakWhen func(chechReg byte, err 
 			break
 		}
 		if e.checkTimeoutExpired(st) {
-			return errors.New(spew.Sprintf("timeout occurs; last read register 0x%x equal to 0x%x", reg, u8))
+			return fmt.Errorf("timeout occurs; last read register 0x%x equal to 0x%x", reg, u8)
 		}
 	}
 	return nil
